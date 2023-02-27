@@ -60,7 +60,22 @@ args = parser.parse_args()
         generator = (
             downloader.get_comments(youtube_id, args.sort, args.language)
             if youtube_id
+            if args.channel:
+    video_url = f"https://www.googleapis.com/youtube/v3/search?part=snippet&channelId={channel_id}&type=video&maxResults={max_results}&pageToken={page_token}&key={api_key}"
+else:
+    video_url = f"https://www.googleapis.com/youtube/v3/videos?part=snippet&id={video_id}&key={api_key}"
             else downloader.get_comments_from_url(youtube_url, args.sort, args.language)
+            def get_video_id(args):
+    url = args.url
+    if 'watch?v=' in url:
+        video_id = url.split('watch?v=')[1].split('&')[0]
+        return video_id
+    elif 'channel/' in url:
+        channel_id = url.split('channel/')[1].split('?')[0]
+        return channel_id
+    else:
+        raise ValueError('Invalid URL')
+
         )
 
         count = 1
