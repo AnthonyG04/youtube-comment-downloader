@@ -8,6 +8,7 @@ import dateparser
 import requests
 
 YOUTUBE_VIDEO_URL = 'https://www.youtube.com/watch?v={youtube_id}'
+parser.add_argument("-u", "--url", help="URL of the YouTube video or channel")
 
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36'
 
@@ -39,6 +40,18 @@ class YoutubeCommentDownloader:
                 return {}
             else:
                 time.sleep(sleep)
+            if args.url:
+    match = re.search(r"(?:v=|\/)([0-9A-Za-z_-]{11})(?:\?|&|$)", args.url)
+    if match:
+        video_id = match.group(1)
+        channel_id = get_channel_id(video_id)
+    else:
+        match = re.search(r"channel\/([\w-]+)", args.url)
+        if match:
+            channel_id = match.group(1)
+        else:
+            print("Invalid YouTube URL")
+            sys.exit(1)
 
     def get_comments(self, youtube_id, *args, **kwargs):
         return self.get_comments_from_url(YOUTUBE_VIDEO_URL.format(youtube_id=youtube_id), *args, **kwargs)
